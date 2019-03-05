@@ -1,0 +1,45 @@
+{
+  "name": "nancheng/pfinal-route",
+  "description": "pfinal路由组件",
+  "authors": [
+    {
+      "name": "南丞",
+      "email": "Lampxiezi@163.com",
+      "homepage": "https://friday-go.cc"
+    }
+  ],
+  "homepage": "https://github.com/pfinalclub/pfinal-route",
+  "license":"MIT",
+  "keywords": [
+    "pfinal",
+    "pfinal社区",
+    "PFinalClub",
+    "南丞",
+    "Q哥",
+    "php-route",
+    "route",
+    "pfinal-route"
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "pf\\route\\": "src/"
+    },
+    "files": [
+      "src/helper.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "tests\\": "tests"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "6.2"
+  },
+  "require": {
+    "php": ">=5.4.0",
+    "nancheng/pfinal-config": "dev-master",
+    "nancheng/pfinal-request": "dev-master"
+  }
+}
