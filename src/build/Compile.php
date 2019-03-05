@@ -70,6 +70,9 @@ trait Compile
         if (preg_match($this->route[$key]['regexp'], $this->requestUrl)) {
             //获取参数
             $this->route[$key]['get'] = $this->getArgs($key);
+            if (!$this->checkArgs($key)) {
+                return false;
+            }
             $this->args = $this->route[$key]['get'];
             foreach ((array)$this->args as $k => $v) {
                 Request::set('get.' . $k, $v);
@@ -86,9 +89,28 @@ trait Compile
         $args = [];
         if (preg_match_all($this->route[$key]['regexp'], $this->requestUrl, $matched, PREG_SET_ORDER)) {
             foreach ($this->route[$key]['args'] as $n => $val) {
-                //var_dump($val);
+                if (isset($matched[0][$n + 1])) {
+                    //数值类型转换
+                    $v = $matched[0][$n + 1];
+                    $args[$val[1]] = is_numeric($v) ? intval($v) : $v;
+                }
             }
         }
         return $args;
+    }
+
+    protected function checkArgs($key)
+    {
+        $route = $this->route[$key];
+        if (!empty($route['where'])) {
+            foreach ($route['where'] as $name => $regexp) {
+                if (isset($route['get'][$name])
+                    && !preg_match($regexp, $route['get'][$name])
+                ) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
