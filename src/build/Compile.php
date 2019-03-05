@@ -113,4 +113,10 @@ trait Compile
         }
         return true;
     }
+
+    public function getMatchRoute()
+    {
+        return $this->route[$this->matchRouteKey];
+    }
+
 }

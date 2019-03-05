@@ -37,7 +37,7 @@ use pf\route\Route;
 
 class Base
 {
-    use Setting, Compile;
+    use Setting, Compile,Controller;
     protected $route = [];
     protected $requestUrl;
 
