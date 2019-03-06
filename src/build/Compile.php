@@ -31,7 +31,10 @@
 
 namespace pf\route\build;
 
+use Closure;
+use pf\container\Container;
 use pf\request\Request;
+use ReflectionFunction;
 
 trait Compile
 {
@@ -119,4 +122,26 @@ trait Compile
         return $this->route[$this->matchRouteKey];
     }
 
+    public function exec()
+    {
+        $key = $this->matchRouteKey;
+        if ($this->route[$key]['callback'] instanceof Closure) {
+            $reflectionFunction = new ReflectionFunction($this->route[$key]['callback']);
+            $args = [];
+            foreach ($reflectionFunction->getParameters() as $k => $v) {
+                if (isset($this->args[$v->name])) {
+                    $args[$v->name] = $this->args[$v->name];
+                } else {
+                    if ($dependency = $v->getClass()) {
+                        $args[$v->name] = Container::build($dependency->name);
+                    } else {
+                        $args[$v->name] = Container::resolveNonClass($v);
+                    }
+                }
+            }
+            return $reflectionFunction->invokeArgs($args);
+        } else {
+            return $this->executeControllerAction($this->route[$key]['callback']);
+        }
+    }
 }

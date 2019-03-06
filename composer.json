@@ -40,6 +40,8 @@
   "require": {
     "php": ">=5.4.0",
     "nancheng/pfinal-config": "dev-master",
-    "nancheng/pfinal-request": "dev-master"
+    "nancheng/pfinal-request": "dev-master",
+    "nancheng/pfinal-cache": "dev-master",
+    "nancheng/pfinal-container": "dev-master"
   }
 }

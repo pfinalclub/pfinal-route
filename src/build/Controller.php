@@ -36,5 +36,6 @@ trait Controller
 {
     protected $controller;
     protected $action;
-    
+
+
 }

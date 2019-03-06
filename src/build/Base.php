@@ -31,24 +31,31 @@
 
 namespace pf\route\build;
 
+use pf\cache\Cache;
 use pf\config\Config;
 use pf\request\Request;
 use pf\route\Route;
 
 class Base
 {
-    use Setting, Compile,Controller;
+    use Setting, Compile, Controller;
     protected $route = [];
     protected $requestUrl;
+    protected $patterns = [
+        ':num' => '[0-9]+',
+        ':all' => '.*'
+    ];
 
     public function bootstrap()
     {
         $this->setDefaultController();
         $this->requestUrl = $this->getRequestUrl();
-        //设置路由缓存 TODO
-        //if(Config::get('route.cache') && ($route =))
-        $this->parseRoute();
-
+        if (Config::get('route.cache') && ($route = Cache::get('_ROUTES_'))) {
+            $this->route = $route;
+        } else {
+            $this->parseRoute();
+        }
+        //var_dump($this->route);exit;
         foreach ($this->route as $key => $value) {
             //var_dump($value);exit;
             $method = '_' . $value['method'];
@@ -69,6 +76,7 @@ class Base
     {
         //设置默认控制器
         $http = Request::get(Config::get('http.url_var'));
+        //var_dump($http);exit;
         if (!empty($http)) {
             $info = explode('/', $http);
             $method = array_pop($info);
@@ -86,10 +94,25 @@ class Base
     {
         foreach ($this->route as $key => $value) {
             $regexp = $value['route'];
-            //var_dump($regexp);exit;
+            if (strpos($regexp, ":") !== false) {
+                $regexp = str_replace(
+                    array_keys($this->patterns),
+                    array_values($this->patterns),
+                    $regexp
+                );
+            }
             preg_match_all("#\{(.*?)(\?)?\}#", $regexp, $args, PREG_SET_ORDER);
-            //var_dump($args);
+            foreach ($args as $i => $ato) {
+                $has = isset($ato[2]) ? $ato[2] : '';
+            }
+
+            $this->route[$key]['regexp'] = '#^' . $regexp . '$#';
+            $this->route[$key]['args'] = $args;
         }
+        if (Config::get('route.cahce')) {
+            Cache::set('__ROUTES__', $this->route);
+        }
+        return $this->route;
     }
 
 }
