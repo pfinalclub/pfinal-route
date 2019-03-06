@@ -30,6 +30,10 @@
  */
 require '../../vendor/autoload.php';
 
+//导入路由文件
+
+include __DIR__ . '/routes/routes.php';
+
 //加载配置文件
 \pf\config\Config::loadFiles('config');
-\pf\route\Route::bootstrap()->exec();
+echo \pf\route\Route::bootstrap()->exec();

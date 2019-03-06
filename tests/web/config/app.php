@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: 南丞
- * Date: 2019/3/5
- * Time: 16:31
+ * Date: 2019/3/6
+ * Time: 13:25
  *
  *
  *                      _ooOoo_
@@ -29,19 +29,6 @@
  *
  */
 
-namespace tests\web\controller;
-
-use pf\request\Request;
-
-class Welcome
-{
-    public function home()
-    {
-        return 'home';
-    }
-
-    public function get(Request $request)
-    {
-        var_dump($request);
-    }
-}
+return [
+    'path' => 'tests'
+];

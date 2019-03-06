@@ -39,12 +39,45 @@ trait Setting
     {
         $this->route[] = [
             'method' => $name
-            , 'route' => $this->prefix . trim(array_shift($arguments), '/')
+            , 'route' => $this->prefix . @trim(array_shift($arguments), '/')
             , 'callback' => array_shift($arguments)
             , 'regexp' => '/./'
             , 'args' => []
             , 'get' => []
         ];
+        return $this;
+    }
+
+    public function group(array $prefix, $callback)
+    {
+        $this->prefix = $prefix['prefix'] . '/';
+        $callback();
+        $this->prefix = '';
+    }
+
+    public function controller($route, $param)
+    {
+        $route = trim($route, '/');
+        $this->route[] = [
+            'method' => 'controller',
+            'route' => $this->prefix . $route . '/{method}(\.\w+)?',
+            'callback' => $param,
+            'regexp' => '',
+            'args' => [],
+        ];
+        return $this;
+    }
+
+    public function resource($route, $controller)
+    {
+        $route = trim($route, '/');
+        $this->get("$route", $controller . '@index');
+        $this->get("$route/create", $controller . '@create');
+        $this->post("$route", $controller . '@store');
+        $this->get("$route/{id}", $controller . '@show');
+        $this->get("$route/{id}/edit", $controller . '@edit');
+        $this->put("$route/{id}", $controller . '@update');
+        $this->delete("$route/{id}", $controller . '@destroy');
         return $this;
     }
 }

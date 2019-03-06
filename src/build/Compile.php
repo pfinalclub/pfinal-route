@@ -69,7 +69,6 @@ trait Compile
 
     protected function isMatch($key)
     {
-
         if (preg_match($this->route[$key]['regexp'], $this->requestUrl)) {
             //获取参数
             $this->route[$key]['get'] = $this->getArgs($key);
@@ -142,6 +141,29 @@ trait Compile
             return $reflectionFunction->invokeArgs($args);
         } else {
             return $this->executeControllerAction($this->route[$key]['callback']);
+        }
+    }
+
+    protected function _controller($key)
+    {
+        if ($this->route[$key]['method'] == 'controller' && $this->isMatch($key)) {
+            $method = strtolower(Request::getRequestType()) . ucfirst($this->route[$key]['get']['method']);
+            $this->route[$key]['callback'] .= '@' . $method;
+            return true;
+        }
+    }
+
+    public function getArg()
+    {
+        return $this->args;
+    }
+
+    public function input($name = null)
+    {
+        if (is_null($name)) {
+            return $this->args;
+        } else {
+            return isset($this->args[$name]) ? $this->args[$name] : null;
         }
     }
 }

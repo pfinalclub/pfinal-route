@@ -32,7 +32,9 @@
 
 namespace pf\route\build;
 
+use pf\container\Container;
 use pf\route\Route;
+use ReflectionMethod;
 
 trait Controller
 {
@@ -46,9 +48,29 @@ trait Controller
         $this->setController($controller = $info[0]);
         $this->setAction($action = $info[1]);
         $path = str_replace(['controller', '\\'], ['view', '/'], Route::getController());
-        var_dump(strtolower($path));
-        exit;
-
+        //var_dump(class_exists($controller));exit;
+        if (!class_exists($controller) || !method_exists($controller, $action)) {
+            throw  new \Exception('访问的方法不存在');
+        }
+        $controller = Container::make($controller, true);
+        try {
+            $reflectionMethod = new \ReflectionMethod($controller, $action);
+            foreach ($reflectionMethod->getParameters() as $k => $p) {
+                if (isset($this->args[$p->name])) {
+                    $args[$p->name] = $this->args[$p->name];
+                } else {
+                    if ($dependency = $p->getClass()) {
+                        $args[$p->name] = Container::build($dependency->name);
+                    } else {
+                        $args[$p->name] = Container::resolveNonClass($p);
+                    }
+                }
+            }
+            return $reflectionMethod->invokeArgs($controller, $args);
+        } catch (\ReflectionException $e) {
+            $method = new ReflectionMethod($controller, '__call');
+            return $method->invokeArgs($controller, [$action, '']);
+        }
     }
 
     protected function setController($controller)

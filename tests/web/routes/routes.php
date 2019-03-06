@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: 南丞
- * Date: 2019/3/5
- * Time: 16:31
+ * Date: 2019/3/6
+ * Time: 13:39
  *
  *
  *                      _ooOoo_
@@ -29,19 +29,18 @@
  *
  */
 
-namespace tests\web\controller;
+//\pf\route\Route::get('/', function () {
+//    return 'root';
+//});
+//
+//\pf\route\Route::get('show', function () {
+//    return '大爷的';
+//});
+//
+//\pf\route\Route::get('show/b/{id}', function () {
+//    return 'pfinal社区';
+//});
 
-use pf\request\Request;
-
-class Welcome
-{
-    public function home()
-    {
-        return 'home';
-    }
-
-    public function get(Request $request)
-    {
-        var_dump($request);
-    }
-}
+\pf\route\Route::get('user/{id}/{name?}', function ($id, $name) {
+    return $id . '-' . $name;
+})->where(['id' => '[0-9]+']);

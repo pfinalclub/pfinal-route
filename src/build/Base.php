@@ -53,11 +53,9 @@ class Base
         if (Config::get('route.cache') && ($route = Cache::get('_ROUTES_'))) {
             $this->route = $route;
         } else {
-            $this->parseRoute();
+            $this->route = $this->parseRoute();
         }
-        //var_dump($this->route);exit;
         foreach ($this->route as $key => $value) {
-            //var_dump($value);exit;
             $method = '_' . $value['method'];
             if ($this->$method($key) === true) {
                 return $this;
@@ -76,12 +74,13 @@ class Base
     {
         //设置默认控制器
         $http = Request::get(Config::get('http.url_var'));
-        //var_dump($http);exit;
         if (!empty($http)) {
             $info = explode('/', $http);
             $method = array_pop($info);
             $controller = ucfirst(array_pop($info));
-
+            $module = array_pop($info);
+            $info[count($info) - 1] = ucfirst($info[count($info) - 1]);
+            $action = Config::get('app.path') . '\\' . $module . '\\controller\\' . $controller . '@' . $method;
         } else {
             $class = Config::get('http.default_controller');
             $method = Config::get('http.default_action');
@@ -104,8 +103,12 @@ class Base
             preg_match_all("#\{(.*?)(\?)?\}#", $regexp, $args, PREG_SET_ORDER);
             foreach ($args as $i => $ato) {
                 $has = isset($ato[2]) ? $ato[2] : '';
+                if ($has) {
+                    $regexp = str_replace($ato[0], '?([a-z0-9]+?)' . $has, $regexp);
+                } else {
+                    $regexp = str_replace($ato[0], '([a-z0-9]+?)' . $has, $regexp);
+                }
             }
-
             $this->route[$key]['regexp'] = '#^' . $regexp . '$#';
             $this->route[$key]['args'] = $args;
         }
@@ -113,6 +116,16 @@ class Base
             Cache::set('__ROUTES__', $this->route);
         }
         return $this->route;
+    }
+
+    public function where($rule, $regexp = '')
+    {
+        $rule = is_array($rule) ? $rule : [$rule => $regexp];
+        $routeKey = count($this->route) - 1;
+        foreach ($rule as $k => $v) {
+            $this->route[$routeKey]['where'][$k] = '#^' . $v . '$#';
+        }
+        return $this;
     }
 
 }
