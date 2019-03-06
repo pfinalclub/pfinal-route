@@ -32,10 +32,37 @@
 
 namespace pf\route\build;
 
+use pf\route\Route;
+
 trait Controller
 {
     protected $controller;
     protected $action;
 
+    public function executeControllerAction($action, $args = [])
+    {
+        $info = explode('@', $action);
+        //var_dump($info);exit;
+        $this->setController($controller = $info[0]);
+        $this->setAction($action = $info[1]);
+        $path = str_replace(['controller', '\\'], ['view', '/'], Route::getController());
+        var_dump(strtolower($path));
+        exit;
 
+    }
+
+    protected function setController($controller)
+    {
+        $this->controller = $controller;
+    }
+
+    protected function setAction($action)
+    {
+        $this->action = $action;
+    }
+
+    public function getController()
+    {
+        return $this->controller;
+    }
 }

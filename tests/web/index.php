@@ -32,4 +32,4 @@ require '../../vendor/autoload.php';
 
 //加载配置文件
 \pf\config\Config::loadFiles('config');
-\pf\route\Route::bootstrap();
+\pf\route\Route::bootstrap()->exec();
